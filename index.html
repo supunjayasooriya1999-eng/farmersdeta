@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Search</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; padding: 20px; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; text-align: center; margin-bottom: 30px; }
+
+        /* Search Bar Layout */
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .search-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; color: #5f6368; margin-bottom: 8px; }
+        input { padding: 12px; border: 2px solid #dfe1e5; border-radius: 8px; outline: none; transition: 0.3s; font-size: 15px; }
+        input:focus { border-color: #1a73e8; }
+
+        /* Table Styles */
+        #resultsWrapper { display: none; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; color: #3c4043; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .name-cell { font-weight: bold; color: #1a73e8; }
+
+        #noResult { display: none; text-align: center; color: #d93025; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Member Search System</h2>
+
+    <div class="search-grid">
+        <div class="search-group">
+            <label>Search by Society Name</label>
+            <input type="text" id="societyInput" onkeyup="searchBySociety()" placeholder="e.g. Gamunu">
+        </div>
+
+        <div class="search-group">
+            <label>Search by ID Number</label>
+            <input type="text" id="idInput" onkeyup="searchByID()" placeholder="e.g. 99312...">
+        </div>
+    </div>
+
+    <div id="resultsWrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Society</th>
+                    <th>ID Number</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody id="listBody"></tbody>
+        </table>
+    </div>
+    
+    <p id="noResult">No matching records found.</p>
+</div>
+
+<script>
+    // Database
+    const database = [
+        { name: "Supun", society: "gamunu", phone: "713071005", id: "993120723v" },
+        { name: "Jayasooriya", society: "gamunu", phone: "N/A", id: "982356753v" },
+        { name: "Pradeep", society: "udawalawa", phone: "N/A", id: "199901107" }
+    ];
+
+    function displayResults(matches) {
+        const wrapper = document.getElementById('resultsWrapper');
+        const listBody = document.getElementById('listBody');
+        const noResult = document.getElementById('noResult');
+
+        listBody.innerHTML = "";
+
+        if (matches.length > 0) {
+            wrapper.style.display = "block";
+            noResult.style.display = "none";
+            matches.forEach(p => {
+                listBody.innerHTML += `<tr>
+                    <td class="name-cell">${p.name}</td>
+                    <td>${p.society}</td>
+                    <td>${p.id}</td>
+                    <td>${p.phone}</td>
+                </tr>`;
+            });
+        } else {
+            wrapper.style.display = "none";
+            noResult.style.display = "block";
+        }
+    }
+
+    // Logic for Society Search (Returns all in that society)
+    function searchBySociety() {
+        document.getElementById('idInput').value = ""; // Clear other bar
+        const query = document.getElementById('societyInput').value.toLowerCase();
+        
+        if (query === "") {
+            hideAll();
+            return;
+        }
+
+        const matches = database.filter(person => 
+            person.society.toLowerCase().includes(query)
+        );
+        displayResults(matches);
+    }
+
+    // Logic for ID Search (Returns specific person)
+    function searchByID() {
+        document.getElementById('societyInput').value = ""; // Clear other bar
+        const query = document.getElementById('idInput').value.toLowerCase();
+
+        if (query === "") {
+            hideAll();
+            return;
+        }
+
+        const matches = database.filter(person => 
+            person.id.toLowerCase().includes(query)
+        );
+        displayResults(matches);
+    }
+
+    function hideAll() {
+        document.getElementById('resultsWrapper').style.display = "none";
+        document.getElementById('noResult').style.display = "none";
+    }
+</script>
+
+</body>
+</html>
